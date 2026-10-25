@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tumbleberry Kids - TikTok Authorization</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+            background: #FFFDF7;
+            color: #2D3748;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        h1 { color: #2B580C; margin-bottom: 12px; }
+        .code-box {
+            background: #EDF2F7;
+            padding: 14px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            margin: 20px 0;
+            border: 1px solid #CBD5E0;
+        }
+        button {
+            background: #48BB78;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover { background: #38A169; }
+        .status { margin-top: 16px; font-size: 0.9rem; color: #718096; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍓 Tumbleberry Kids Studio</h1>
+        <p>TikTok Authorization Callback</p>
+
+        <div id="content">
+            <p>Processing authorization code...</p>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const contentDiv = document.getElementById('content');
+
+        if (code) {
+            contentDiv.innerHTML = `
+                <p>✅ <strong>Authorization successful!</strong></p>
+                <p>Your authorization code:</p>
+                <div class="code-box" id="authCode">${code}</div>
+                <button onclick="copyCode()">Copy Code</button>
+                <p class="status" id="statusMsg">Forwarding to local upload automation script...</p>
+            `;
+
+            // Try forwarding to local Python listener
+            fetch('http://127.0.0.1:8080/callback' + window.location.search)
+                .then(() => {
+                    document.getElementById('statusMsg').innerText = "✅ Successfully forwarded to local upload tool! You can close this tab.";
+                })
+                .catch(() => {
+                    document.getElementById('statusMsg').innerText = "Copy the code above and paste it into the terminal.";
+                });
+        } else {
+            contentDiv.innerHTML = `<p style="color: #E53E3E;">No authorization code received. Check your TikTok login flow.</p>`;
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Code copied to clipboard!");
+            });
+        }
+    </script>
+</body>
+</html>
